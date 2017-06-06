@@ -91,13 +91,92 @@ class RBTree {
 
     }
     public void delete(RBTree T, Node z) {
-        if(z.left == T.nil)
-            Transplant(T,z,z.right);
-        else if (z.right == T.nil)
-            Transplant(T,z,z.left);
+        Node y = z;
+        Node x;
+        char y_original_color = y.color;
+        if(z.left == T.nil) {
+            x = z.right;
+            Transplant(T, z, z.right);
+        }
+        else if (z.right == T.nil) {
+            x = z.left;
+            Transplant(T, z, z.left);
+        }
         else {
             Node y = Tree_Minimum(z.right);
-            
+            y_original_color = y.color;
+            x = y.right;
+            if (y.parent != z) {
+                Transplant(T,y,y.right);
+                y.right = z.right;
+                y.right.parent = y;
+            }
+            else
+                x.parent = y;
+            Transplant(T,z,y);
+            y.left = z.left;
+            y.left.parent = y;
+            y.color = z.color;
+        }
+        if (y_original_color == 'b')
+                RB_Delete_Fixup(T, x);
+    }
+
+    public void RB_Delete_Fixup(RBTree T, Node x) {
+        Node w;
+        while ((x != T.root)&&(x.color == 'b')) {
+            if (x == x.parent.left) {
+                w = x.parent.right;
+                if (w.color == 'r') {
+                    w.color = 'b';
+                    x.parent.color = 'r';
+                    left_rotate(T, x.parent);
+                    w = x.parent.right;
+                }
+                if ((w.right.color == 'b') && (w.right.color == 'b')) {
+                    w.color = 'r';
+                    x = x.parent;
+                } else {
+                    if (w.right.color == 'b') {
+                        w.left.color = 'b';
+                        w.color = 'r';
+                        right_rotate(T, w);
+                        w = x.parent.right;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = 'b';
+                    w.right.color = 'b';
+                    left_rotate(T, x.parent);
+                    x = T.root;
+                }
+
+            }
+        else {
+                w = x.parent.left;
+                if (w.color == 'r') {
+                    w.color = 'b';
+                    x.parent.color = 'r';
+                    right_rotate(T, x.parent);
+                    w = x.parent.left;
+                }
+                if ((w.left.color == 'b') && (w.left.color == 'b')) {
+                    w.color = 'r';
+                    x = x.parent;
+                } else {
+                    if (w.left.color == 'b') {
+                        w.right.color = 'b';
+                        w.color = 'r';
+                        left_rotate(T, w);
+                        w = x.parent.left;
+                    }
+                    w.color = x.parent.color;
+                    x.parent.color = 'b';
+                    w.left.color = 'b';
+                    right_rotate(T, x.parent);
+                    x = T.root;
+                }
+            }
+
         }
     }
 
