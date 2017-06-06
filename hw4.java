@@ -1,0 +1,213 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+class Node {
+    public int val;
+    public Node left, right, parent;
+    char color;
+    public Node(int newval) {
+        parent = null;
+        val = newval;
+        left = null;
+        right = null;
+    }
+}
+
+class RBTree {
+    public Node root;
+    public Node nil = null;
+    public RBTree() {
+        root = null;
+    }
+
+    public void insert(RBTree tree, Node n) {
+        Node y = tree.nil;
+        Node x = tree.root;
+        while (x != tree.nil) {
+            y = x;
+            if (n.val < x.val) {
+                x = x.left;
+            }
+            else x = x.right;
+        }
+        n.parent = y;
+
+        if(y == tree.nil)
+            tree.root = n;
+        else if (n.val < y.val)
+            y.left = n;
+        else y.right = n;
+        n.left = tree.nil;
+        n.right = tree.nil;
+        n.color = 'r';
+        RB_Insert_Fixup(tree, n);
+    }
+
+    public void RB_Insert_Fixup(RBTree T, Node n) {
+        while (n.parent.color == 'r') {
+            if (n.parent == n.parent.parent.left) {
+                Node y = n.parent.parent.right;
+                if(y.color == 'r'){
+                    n.parent.color = 'b';
+                    y.color = 'b';
+                    n.parent.parent.color = 'r';
+                    n = n.parent.parent;
+                }
+                else {
+                    if (n == n.parent.right){
+                        n = n.parent;
+                        left_rotate(T,n);
+                    }
+
+                    n.parent.color = 'b';
+                    n.parent.parent.color = 'r';
+                    right_rotate(T,n.parent.parent);
+                }
+            }
+            else {
+                Node y = n.parent.parent.left;
+                if(y.color == 'r'){
+                    n.parent.color = 'b';
+                    y.color = 'b';
+                    n.parent.parent.color = 'r';
+                    n = n.parent.parent;
+                }
+                else {
+                    if (n == n.parent.left){
+                        n = n.parent;
+                        right_rotate(T,n);
+                    }
+                    n.parent.color = 'b';
+                    n.parent.parent.color = 'r';
+                    left_rotate(T,n.parent.parent);
+                }
+            }
+            T.root.color = 'b';
+        }
+    }
+
+    public void Transplant(RBTree T, Node z, Node x){
+
+    }
+    public void delete(RBTree T, Node z) {
+        if(z.left == T.nil)
+            Transplant(T,z,z.right);
+        else if (z.right == T.nil)
+            Transplant(T,z,z.left);
+        else {
+            Node y = Tree_Minimum(z.right);
+            
+        }
+    }
+
+    public Node search (Node tree, int val) {
+        if (tree == null)
+            return null;
+        else if (val == tree.val)
+            return tree;
+        else if (val < tree.val)
+            return search(tree.left,val);
+        else
+            return search(tree.right,val);
+    }
+    public void print(Node tree, int level) {
+        if (tree.right != null)
+            print(tree.right, level + 1);
+        for(int i = 0; i < level; i++)
+            System.out.print("    ");
+        System.out.println(tree.val);
+        if (tree.left != null)
+            print(tree.left, level + 1);
+    }
+    public void inorder(Node tree) {
+        if (tree == null)
+            return;
+        else {
+            inorder(tree.left);
+            System.out.print(" " + tree.val);
+            inorder(tree.right);
+        }
+    }
+
+    public void inorder_iter() {
+        if (root == null)
+            return;
+        Stack stack = new Stack();
+        Node node = root;
+        while (node != null) {
+            stack.push(node);
+            node = node.left;
+        }
+        while (!stack.is_empty()) {
+            node = stack.pop();
+            System.out.print(node.val + " ");
+            if (node.right != null) {
+                node = node.right;
+                while (node != null) {
+                    stack.push(node);
+                    node = node.left;
+                }
+            }
+        }
+    }
+
+    public void left_rotate(RBTree T, Node x) {
+        Node y = x.right;
+        x.right = y.left;
+        if(y.left != T.nil)
+            y.left.parent = x;
+        y.parent = x.parent;
+        if(x.parent == T.nil)
+            T.root = y;
+        else if (x == x.parent.left)
+            x.parent.left = y;
+        else x.parent.right = y;
+        y.left = x;
+        x.parent = y;
+    }
+
+    public void right_rotate(RBTree T, Node y) {
+        Node x = y.left;
+        y.left = x.right;
+        if(x.right != T.nil)
+            x.right.parent = y;
+        x.parent = y.parent;
+        if(x.parent == T.nil)
+            T.root = x;
+        else if (y == y.parent.right)
+            y.parent.right = x;
+        else y.parent.left = x;
+        x.right = y;
+        y.parent = x;
+    }
+}
+
+class Stack {
+    ArrayList stk = new ArrayList<Node>();
+    int top = 0;
+    void push(Node a) {
+        stk.add(a);
+    }
+    Node pop() {
+        return (Node)stk.remove(stk.size() - 1);
+    }
+    boolean is_empty() {
+        return top == 0;
+    }
+}
+
+
+
+
+public class hw4 {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+        while(true) {
+            String line = br.readLine();
+            if (line==null) break;
+            System.out.println(line);
+        }
+        br.close();
+    }
+}
